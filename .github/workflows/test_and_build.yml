@@ -165,9 +165,9 @@ jobs:
   build_linux_x64:
     runs-on: ubuntu-latest
     if: ${{ !startsWith( github.event.pull_request.head.label, 'lan2play-weblate' ) }}
-    # needs:
+    needs:
     # - test_linux_x64
-    # - get_versions
+    - get_versions
     env:
       PUGSHARPNETVER: ${{needs.get_versions.outputs.PUGSHARPNETVER}}
       CSSHARPVER: ${{needs.get_versions.outputs.CSSHARPVER}}
