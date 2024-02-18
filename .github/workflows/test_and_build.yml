@@ -83,82 +83,82 @@ jobs:
   #       run: ./sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
 
-  # get_versions:
-  #   runs-on: ubuntu-latest
-  #   if: ${{ !startsWith( github.event.pull_request.head.label, 'lan2play-weblate' ) }}
-  #   outputs:
-  #     PUGSHARPNETVER: ${{ steps.PUGSHARPNETVER.outputs.PUGSHARPNETVER }}
-  #     CSSHARPVER: ${{ steps.CSSHARPVER.outputs.CSSHARPVER }}
-  #     CSSHARPlink: ${{ steps.CSSHARPlink.outputs.CSSHARPlink }}
-  #     CSSHARPlinkWRuntime: ${{ steps.CSSHARPlinkWRuntime.outputs.CSSHARPlinkWRuntime }}
-  #     CSSHARPlinkWindows: ${{ steps.CSSHARPlinkWindows.outputs.CSSHARPlinkWindows }}
-  #     CSSHARPlinkWRuntimeWindows: ${{ steps.CSSHARPlinkWRuntimeWindows.outputs.CSSHARPlinkWRuntimeWindows }}
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-  #       with:
-  #         submodules: recursive
-  #     - name: install deps
-  #       run: sudo apt-get update && sudo apt-get install jq -y
-  #     - name: get Pugsharp dependencies
-  #       run: dotnet restore
+  get_versions:
+    runs-on: ubuntu-latest
+    if: ${{ !startsWith( github.event.pull_request.head.label, 'lan2play-weblate' ) }}
+    outputs:
+      PUGSHARPNETVER: ${{ steps.PUGSHARPNETVER.outputs.PUGSHARPNETVER }}
+      CSSHARPVER: ${{ steps.CSSHARPVER.outputs.CSSHARPVER }}
+      CSSHARPlink: ${{ steps.CSSHARPlink.outputs.CSSHARPlink }}
+      CSSHARPlinkWRuntime: ${{ steps.CSSHARPlinkWRuntime.outputs.CSSHARPlinkWRuntime }}
+      CSSHARPlinkWindows: ${{ steps.CSSHARPlinkWindows.outputs.CSSHARPlinkWindows }}
+      CSSHARPlinkWRuntimeWindows: ${{ steps.CSSHARPlinkWRuntimeWindows.outputs.CSSHARPlinkWRuntimeWindows }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: install deps
+        run: sudo apt-get update && sudo apt-get install jq -y
+      - name: get Pugsharp dependencies
+        run: dotnet restore
 
-  #     - name: set Pugsharp Version
-  #       if: ${{ (startsWith(github.ref, 'refs/tags/v')) }}
-  #       run:  echo "PUGSHARPNETVER=$(echo ${GITHUB_REF} | sed 's|refs/heads/||g' | sed 's|refs/tags/v||g' )" >> $GITHUB_ENV
-  #     - name: set Pugsharp Version
-  #       if: ${{ !(startsWith(github.ref, 'refs/tags/v')) }}
-  #       run:  echo "PUGSHARPNETVER=0.0.1-alpha" >> $GITHUB_ENV
-  #     - name: set Pugsharp Version in output
-  #       run: echo "PUGSHARPNETVER=$PUGSHARPNETVER" >> "$GITHUB_OUTPUT"
-  #       id: PUGSHARPNETVER
+      - name: set Pugsharp Version
+        if: ${{ (startsWith(github.ref, 'refs/tags/v')) }}
+        run:  echo "PUGSHARPNETVER=$(echo ${GITHUB_REF} | sed 's|refs/heads/||g' | sed 's|refs/tags/v||g' )" >> $GITHUB_ENV
+      - name: set Pugsharp Version
+        if: ${{ !(startsWith(github.ref, 'refs/tags/v')) }}
+        run:  echo "PUGSHARPNETVER=0.0.1-alpha" >> $GITHUB_ENV
+      - name: set Pugsharp Version in output
+        run: echo "PUGSHARPNETVER=$PUGSHARPNETVER" >> "$GITHUB_OUTPUT"
+        id: PUGSHARPNETVER
 
-  #     - name: get counterstrikesharp version
-  #       run: echo "CSSHARPVER=$(dotnet list PugSharp/PugSharp.csproj package --format json | jq -r '.projects[].frameworks[].topLevelPackages[] | select(.id == "CounterStrikeSharp.API") | .resolvedVersion' | sed 's|1.0.|v|g')"  >> $GITHUB_ENV
-  #     - name: set counterstrikesharp version in output
-  #       run: echo "CSSHARPVER=$CSSHARPVER" >> "$GITHUB_OUTPUT"
-  #       id: CSSHARPVER
+      - name: get counterstrikesharp version
+        run: echo "CSSHARPVER=$(dotnet list PugSharp/PugSharp.csproj package --format json | jq -r '.projects[].frameworks[].topLevelPackages[] | select(.id == "CounterStrikeSharp.API") | .resolvedVersion' | sed 's|1.0.|v|g')"  >> $GITHUB_ENV
+      - name: set counterstrikesharp version in output
+        run: echo "CSSHARPVER=$CSSHARPVER" >> "$GITHUB_OUTPUT"
+        id: CSSHARPVER
 
-  #     - name: get counterstrikesharp link with runtime
-  #       run: echo "CSSHARPlinkWRuntime=$(curl -s -L https://api.github.com/repos/roflmuffin/CounterStrikeSharp/releases/tags/$CSSHARPVER | jq -r '.assets[] | select(.browser_download_url | test("with-runtime.*linux")) | .browser_download_url')" >> $GITHUB_ENV
-  #     - name: set counterstrikesharp link with runtime in output
-  #       run: echo "CSSHARPlinkWRuntime=$CSSHARPlinkWRuntime" >> "$GITHUB_OUTPUT"
-  #       id: CSSHARPlinkWRuntime
+      - name: get counterstrikesharp link with runtime
+        run: echo "CSSHARPlinkWRuntime=$(curl -s -L https://api.github.com/repos/roflmuffin/CounterStrikeSharp/releases/tags/$CSSHARPVER | jq -r '.assets[] | select(.browser_download_url | test("with-runtime.*linux")) | .browser_download_url')" >> $GITHUB_ENV
+      - name: set counterstrikesharp link with runtime in output
+        run: echo "CSSHARPlinkWRuntime=$CSSHARPlinkWRuntime" >> "$GITHUB_OUTPUT"
+        id: CSSHARPlinkWRuntime
 
-  #     - name: get counterstrikesharp link without runtime
-  #       run: echo "CSSHARPlink=$(curl -s -L https://api.github.com/repos/roflmuffin/CounterStrikeSharp/releases/tags/$CSSHARPVER | jq -r '.assets[] | select(.browser_download_url | contains("linux") and (. | contains("with-runtime") | not)) | .browser_download_url')" >> $GITHUB_ENV
-  #     - name: set counterstrikesharp link without runtime in output
-  #       run: echo "CSSHARPlink=$CSSHARPlink" >> "$GITHUB_OUTPUT"
-  #       id: CSSHARPlink
+      - name: get counterstrikesharp link without runtime
+        run: echo "CSSHARPlink=$(curl -s -L https://api.github.com/repos/roflmuffin/CounterStrikeSharp/releases/tags/$CSSHARPVER | jq -r '.assets[] | select(.browser_download_url | contains("linux") and (. | contains("with-runtime") | not)) | .browser_download_url')" >> $GITHUB_ENV
+      - name: set counterstrikesharp link without runtime in output
+        run: echo "CSSHARPlink=$CSSHARPlink" >> "$GITHUB_OUTPUT"
+        id: CSSHARPlink
 
-  #     - name: get counterstrikesharp link with runtime for windows
-  #       run: echo "CSSHARPlinkWRuntimeWindows=$(curl -s -L https://api.github.com/repos/roflmuffin/CounterStrikeSharp/releases/tags/$CSSHARPVER | jq -r '.assets[] | select(.browser_download_url | test("with-runtime.*windows")) | .browser_download_url')" >> $GITHUB_ENV
-  #     - name: set counterstrikesharp link with runtime for windows in output
-  #       run: echo "CSSHARPlinkWRuntimeWindows=$CSSHARPlinkWRuntimeWindows" >> "$GITHUB_OUTPUT"
-  #       id: CSSHARPlinkWRuntimeWindows
+      - name: get counterstrikesharp link with runtime for windows
+        run: echo "CSSHARPlinkWRuntimeWindows=$(curl -s -L https://api.github.com/repos/roflmuffin/CounterStrikeSharp/releases/tags/$CSSHARPVER | jq -r '.assets[] | select(.browser_download_url | test("with-runtime.*windows")) | .browser_download_url')" >> $GITHUB_ENV
+      - name: set counterstrikesharp link with runtime for windows in output
+        run: echo "CSSHARPlinkWRuntimeWindows=$CSSHARPlinkWRuntimeWindows" >> "$GITHUB_OUTPUT"
+        id: CSSHARPlinkWRuntimeWindows
 
-  #     - name: get counterstrikesharp link without runtime for windows
-  #       run: echo "CSSHARPlinkWindows=$(curl -s -L https://api.github.com/repos/roflmuffin/CounterStrikeSharp/releases/tags/$CSSHARPVER | jq -r '.assets[] | select(.browser_download_url | contains("windows") and (. | contains("with-runtime") | not)) | .browser_download_url')" >> $GITHUB_ENV
-  #     - name: set counterstrikesharp link without runtime for windows in output
-  #       run: echo "CSSHARPlinkWindows=$CSSHARPlinkWindows" >> "$GITHUB_OUTPUT"
-  #       id: CSSHARPlinkWindows
+      - name: get counterstrikesharp link without runtime for windows
+        run: echo "CSSHARPlinkWindows=$(curl -s -L https://api.github.com/repos/roflmuffin/CounterStrikeSharp/releases/tags/$CSSHARPVER | jq -r '.assets[] | select(.browser_download_url | contains("windows") and (. | contains("with-runtime") | not)) | .browser_download_url')" >> $GITHUB_ENV
+      - name: set counterstrikesharp link without runtime for windows in output
+        run: echo "CSSHARPlinkWindows=$CSSHARPlinkWindows" >> "$GITHUB_OUTPUT"
+        id: CSSHARPlinkWindows
 
-  #     - name: replace version variable in meta files
-  #       run: sed -i "s|%%VERSION%%|$PUGSHARPNETVER|g" ./release.json;
-  #     - name: replace CounterStrikeSharpVersion variable in meta files
-  #       run: sed -i "s|%%COUNTERSTRIKESHARPVERSION%%|$CSSHARPVER|g" ./release.json;
-  #     - name: replace CS2VERSION variable in meta files
-  #       run: sed -i "s|%%CS2VERSION%%|1.39.6.5/13965 9842|g" ./release.json;
-  #     - name: replace METAMODVERSION variable in meta files
-  #       run: sed -i "s|%%METAMODVERSION%%|2.0 - 1256|g" ./release.json;
-  #     - name: upload artefact
-  #       if: github.event_name != 'pull_request'
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: latest_build_meta
-  #         path: |
-  #           ./release.json
-  #         retention-days: 10
+      - name: replace version variable in meta files
+        run: sed -i "s|%%VERSION%%|$PUGSHARPNETVER|g" ./release.json;
+      - name: replace CounterStrikeSharpVersion variable in meta files
+        run: sed -i "s|%%COUNTERSTRIKESHARPVERSION%%|$CSSHARPVER|g" ./release.json;
+      - name: replace CS2VERSION variable in meta files
+        run: sed -i "s|%%CS2VERSION%%|1.39.6.5/13965 9842|g" ./release.json;
+      - name: replace METAMODVERSION variable in meta files
+        run: sed -i "s|%%METAMODVERSION%%|2.0 - 1256|g" ./release.json;
+      - name: upload artefact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: latest_build_meta
+          path: |
+            ./release.json
+          retention-days: 10
 
 
 
